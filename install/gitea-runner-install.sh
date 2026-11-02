@@ -48,6 +48,7 @@ Wants=network-online.target docker.service
 Type=simple
 ExecStart=/usr/local/bin/gitea-runner daemon --config /etc/gitea-runner/config.yaml
 WorkingDirectory=/var/lib/gitea-runner
+Environment=HOME=/var/lib/gitea-runner
 Restart=on-failure
 RestartSec=5s
 TimeoutStopSec=3h
@@ -95,6 +96,7 @@ setup_alpine() {
 name="gitea-runner"
 description="Gitea Actions Runner"
 
+export HOME="/var/lib/gitea-runner"
 command="/usr/local/bin/gitea-runner"
 command_args="daemon --config /etc/gitea-runner/config.yaml"
 directory="/var/lib/gitea-runner"

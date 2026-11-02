@@ -18,7 +18,7 @@ PG_DB_NAME="windmill" PG_DB_USER="windmill" setup_postgresql_db
 setup_uv
 NODE_VERSION="24" NODE_MODULE="bun" setup_nodejs
 fetch_and_deploy_gh_release "windmill" "windmill-labs/windmill" "singlefile" "latest" "/opt/windmill" "windmill-amd64"
-USE_ORIGINAL_FILENAME="true" fetch_and_deploy_gh_release "windmill-duckdb" "windmill-labs/windmill" "singlefile" "latest" "/opt/windmill" "libwindmill_duckdb_ffi_internal.so"
+USE_ORIGINAL_FILENAME="true" fetch_and_deploy_gh_release "windmill-duckdb" "windmill-labs/windmill" "singlefile" "latest" "/opt/windmill" "windmill_duckdb_runner"
 
 msg_info "Creating Windmill Database Roles"
 # Windmill's migrations can only create these as superuser (windmill_admin needs BYPASSRLS)
@@ -50,7 +50,6 @@ EnvironmentFile=/opt/windmill_data/.env
 # ~/.windmill is the version file, but Windmill keeps its standalone bundles in \$HOME/.windmill
 Environment=HOME=/opt/windmill_data
 Environment=WINDMILL_DIR=/opt/windmill_data
-Environment=LD_LIBRARY_PATH=/opt/windmill
 ExecStart=/opt/windmill/windmill
 Restart=on-failure
 RestartSec=5

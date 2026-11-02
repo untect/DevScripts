@@ -40,7 +40,7 @@ function update_script() {
     setup_uv
     NODE_VERSION="24" NODE_MODULE="bun" setup_nodejs
     fetch_and_deploy_gh_release "windmill" "windmill-labs/windmill" "singlefile" "latest" "/opt/windmill" "windmill-amd64"
-    USE_ORIGINAL_FILENAME="true" fetch_and_deploy_gh_release "windmill-duckdb" "windmill-labs/windmill" "singlefile" "latest" "/opt/windmill" "libwindmill_duckdb_ffi_internal.so"
+    USE_ORIGINAL_FILENAME="true" fetch_and_deploy_gh_release "windmill-duckdb" "windmill-labs/windmill" "singlefile" "latest" "/opt/windmill" "windmill_duckdb_runner"
 
     msg_info "Starting Windmill"
     systemctl start windmill

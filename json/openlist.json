@@ -30,18 +30,6 @@
         "os": "Debian",
         "version": "13"
       }
-    },
-    {
-      "type": "alpine",
-      "script": "ct/openlist.sh",
-      "config_path": "/opt/openlist_data/config.json",
-      "resources": {
-        "cpu": 1,
-        "ram": 512,
-        "hdd": 4,
-        "os": "Alpine",
-        "version": "3.24"
-      }
     }
   ],
   "default_credentials": {
@@ -49,10 +37,6 @@
     "password": null
   },
   "notes": [
-    {
-      "text": "One script serves both variants: the installer asks for the container OS, or pass var_os=alpine to pick Alpine unattended.",
-      "type": "info"
-    },
     {
       "text": "The admin password is generated during the installation and saved to /root/openlist.creds inside the container. Change it with `/opt/openlist/openlist --data /opt/openlist_data admin set <password>`.",
       "type": "info"

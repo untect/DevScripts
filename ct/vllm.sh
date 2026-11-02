@@ -51,7 +51,7 @@ function update_script() {
       ;;
     cpu)
       $STD uv pip install --python /opt/vllm/bin/python \
-        "https://github.com/vllm-project/vllm/releases/download/v${VLLM_VERSION}/vllm-${VLLM_VERSION}+cpu-cp38-abi3-manylinux_2_34_x86_64.whl" \
+        "https://github.com/vllm-project/vllm/releases/download/v${VLLM_VERSION}/vllm-${VLLM_VERSION}+cpu-cp38-abi3-manylinux_2_39_x86_64.whl" \
         --torch-backend cpu
       ;;
     *)

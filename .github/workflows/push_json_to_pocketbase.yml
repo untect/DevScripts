@@ -288,6 +288,9 @@ jobs:
             if (data.version !== undefined) payload.version = data.version;
             if (data.changelog !== undefined) payload.changelog = data.changelog;
             if (data.screenshots !== undefined) payload.screenshots = data.screenshots;
+            // Maintainer-owned: only written when the JSON carries the key, so an
+            // unrelated push never clears a link a maintainer set by hand.
+            if (data.oidc_url !== undefined) payload.oidc_url = data.oidc_url;
             const filter = "(slug='" + data.slug + "')";
             const listRes = await request(recordsUrl + '?filter=' + encodeURIComponent(filter) + '&perPage=1', {
               headers: { 'Authorization': token }

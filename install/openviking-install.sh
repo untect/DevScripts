@@ -13,21 +13,24 @@ setting_up_container
 network_check
 update_os
 
-_ov_install_server() {
-  PYTHON_VERSION="3.12" setup_uv
+msg_info "Installing Dependencies"
+$STD apt install -y openssl
+msg_ok "Installed Dependencies"
 
-  msg_info "Installing OpenViking"
-  $STD uv venv --python 3.12 /opt/openviking
-  $STD uv pip install --python /opt/openviking/bin/python openviking
-  cat <<EOF >~/.openviking-server
+PYTHON_VERSION="3.12" setup_uv
+
+msg_info "Installing OpenViking"
+$STD uv venv --python 3.12 /opt/openviking
+$STD uv pip install --python /opt/openviking/bin/python openviking
+cat <<EOF >~/.openviking-server
 $(get_latest_github_release "volcengine/OpenViking")
 EOF
-  msg_ok "Installed OpenViking"
+msg_ok "Installed OpenViking"
 
-  msg_info "Configuring OpenViking"
-  ROOT_API_KEY=$(openssl rand -hex 32)
-  mkdir -p /opt/openviking_data
-  cat <<EOF >/opt/openviking_data/ov.conf
+msg_info "Configuring OpenViking"
+ROOT_API_KEY=$(openssl rand -hex 32)
+mkdir -p /opt/openviking_data
+cat <<EOF >/opt/openviking_data/ov.conf
 {
   "server": {
     "host": "0.0.0.0",
@@ -57,34 +60,11 @@ EOF
   }
 }
 EOF
-  chmod 600 /opt/openviking_data/ov.conf
-  msg_ok "Configured OpenViking"
-}
+chmod 600 /opt/openviking_data/ov.conf
+msg_ok "Configured OpenViking"
 
-_ov_wait_ready() {
-  local ready=0
-  for _ in {1..30}; do
-    if curl -fsS -o /dev/null "http://127.0.0.1:1933/health"; then
-      ready=1
-      break
-    fi
-    sleep 2
-  done
-  if [[ "$ready" -ne 1 ]]; then
-    msg_error "OpenViking did not become healthy within 60 seconds — check 'systemctl status openviking' (Debian) or 'rc-service openviking status' (Alpine)"
-    exit 1
-  fi
-}
-
-setup_deb_based() {
-  msg_info "Installing Dependencies"
-  $STD apt install -y openssl
-  msg_ok "Installed Dependencies"
-
-  _ov_install_server
-
-  msg_info "Creating Service"
-  cat <<EOF >/etc/systemd/system/openviking.service
+msg_info "Creating Service"
+cat <<EOF >/etc/systemd/system/openviking.service
 [Unit]
 Description=OpenViking HTTP Server
 After=network.target
@@ -101,53 +81,21 @@ RestartSec=5
 [Install]
 WantedBy=multi-user.target
 EOF
-  systemctl enable -q --now openviking
-  _ov_wait_ready
-  msg_ok "Created Service"
-}
+systemctl enable -q --now openviking
 
-setup_alpine() {
-  msg_info "Installing Dependencies"
-  $STD apk add openssl
-  msg_ok "Installed Dependencies"
-
-  _ov_install_server
-
-  msg_info "Creating Service"
-  cat <<'EOF' >/etc/init.d/openviking
-#!/sbin/openrc-run
-name="OpenViking"
-description="OpenViking - a self-evolving context database for AI agents"
-
-command="/opt/openviking/bin/openviking-server"
-command_user="root"
-supervisor=supervise-daemon
-output_log="/var/log/openviking.log"
-error_log="/var/log/openviking.log"
-pidfile="/run/${RC_SVCNAME}.pid"
-respawn_delay=10
-
-depend() {
-  need net
-  after firewall
-}
-
-start_pre() {
-  checkpath -d -m 0750 -o root:root /opt/openviking_data
-  checkpath -f -m 0640 "$output_log"
-}
-EOF
-  chmod +x /etc/init.d/openviking
-  cat <<EOF >/etc/conf.d/openviking
-export OPENVIKING_CONFIG_FILE=/opt/openviking_data/ov.conf
-EOF
-  $STD rc-update add openviking default
-  $STD rc-service openviking start
-  _ov_wait_ready
-  msg_ok "Created Service"
-}
-
-run_os_setup
+ready=0
+for _ in {1..60}; do
+  if curl -fsS -o /dev/null "http://127.0.0.1:1933/health"; then
+    ready=1
+    break
+  fi
+  sleep 2
+done
+if [[ "$ready" -ne 1 ]]; then
+  msg_error "OpenViking did not become healthy within 120 seconds — check 'systemctl status openviking'"
+  exit 1
+fi
+msg_ok "Created Service"
 
 msg_info "Running OpenViking Doctor"
 if OPENVIKING_CONFIG_FILE=/opt/openviking_data/ov.conf /opt/openviking/bin/openviking-server doctor >/dev/null 2>&1; then

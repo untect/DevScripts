@@ -30,18 +30,6 @@
         "os": "Debian",
         "version": "13"
       }
-    },
-    {
-      "type": "alpine",
-      "script": "ct/openviking.sh",
-      "config_path": "/opt/openviking_data/ov.conf",
-      "resources": {
-        "cpu": 1,
-        "ram": 1024,
-        "hdd": 8,
-        "os": "Alpine",
-        "version": "3.24"
-      }
     }
   ],
   "default_credentials": {
